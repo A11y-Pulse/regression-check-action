@@ -1,0 +1,58 @@
+name: A11y Pulse regression check
+description: Checks a preview deployment against a baseline for new accessibility issues.
+inputs:
+  api-key:
+    description: A11y Pulse API key. Pass it from a repository secret.
+    required: true
+  site-id:
+    description: The A11y Pulse site id to check.
+    required: true
+  head-url:
+    description: The preview URL to check.
+    required: true
+  base-url:
+    description: The baseline URL to compare against.
+    required: true
+  paths:
+    description: Paths to check, one per line. Defaults to the site's monitored pages.
+    required: false
+    default: ""
+  base-ref:
+    description: The git ref or SHA of the baseline.
+    required: false
+    default: ${{ github.event.pull_request.base.sha }}
+  fail-on:
+    description: The lowest impact that fails the check.
+    required: false
+    default: serious
+  timeout-minutes:
+    description: How long to wait for the check to finish.
+    required: false
+    default: "10"
+  api-url:
+    description: The A11y Pulse API URL.
+    required: false
+    default: https://api.a11ypulse.com
+outputs:
+  conclusion:
+    description: success, failure or neutral.
+    value: ${{ steps.check.outputs.conclusion }}
+  report-url:
+    description: Link to the full report.
+    value: ${{ steps.check.outputs.report-url }}
+runs:
+  using: composite
+  steps:
+    - id: check
+      shell: bash
+      env:
+        INPUT_API-KEY: ${{ inputs.api-key }}
+        INPUT_SITE-ID: ${{ inputs.site-id }}
+        INPUT_HEAD-URL: ${{ inputs.head-url }}
+        INPUT_BASE-URL: ${{ inputs.base-url }}
+        INPUT_PATHS: ${{ inputs.paths }}
+        INPUT_BASE-REF: ${{ inputs.base-ref }}
+        INPUT_FAIL-ON: ${{ inputs.fail-on }}
+        INPUT_TIMEOUT-MINUTES: ${{ inputs.timeout-minutes }}
+        INPUT_API-URL: ${{ inputs.api-url }}
+      run: node "${{ github.action_path }}/index.mjs"
