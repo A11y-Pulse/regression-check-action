@@ -1,5 +1,8 @@
 name: A11y Pulse regression check
 description: Checks a preview deployment against a baseline for new accessibility issues.
+branding:
+  icon: git-pull-request
+  color: purple
 inputs:
   api-key:
     description: A11y Pulse API key. Pass it from a repository secret.
